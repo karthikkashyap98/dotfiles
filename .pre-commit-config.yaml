@@ -1,0 +1,8 @@
+repos:
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.0.3  # You can check for the latest release on GitHub
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets in code
+        files: .*
+
