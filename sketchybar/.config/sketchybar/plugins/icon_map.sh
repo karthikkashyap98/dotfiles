@@ -391,7 +391,7 @@ function __icon_map() {
         icon_result=":omni_focus:"
         ;;
    "1Password")
-        icon_result=":one_password:"
+        icon_result=":one_password:" # pragma: allowlist-secret
         ;;
    "ChatGPT")
         icon_result=":openai:"

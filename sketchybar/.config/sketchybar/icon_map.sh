@@ -391,7 +391,7 @@ function __icon_map() {
         icon_result=":netease_music:"
         ;;
    "Noodl" | "Noodl Editor")
-        icon_result=":noodl:"
+        icon_result=":noodl:" # pragma: allowlist-secret
         ;;
    "NordVPN")
         icon_result=":nord_vpn:"
@@ -420,11 +420,8 @@ function __icon_map() {
    "OmniFocus")
         icon_result=":omni_focus:"
         ;;
-   "1Password")
-        icon_result=":one_password:"
-        ;;
    "Open Video Downloader")
-        icon_result=":open_video_downloader:"
+        icon_result=":open_video_downloader:" # pragma: allowlist-secret
         ;;
    "ChatGPT")
         icon_result=":openai:"

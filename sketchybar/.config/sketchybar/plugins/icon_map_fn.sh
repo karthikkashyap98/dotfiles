@@ -75,7 +75,7 @@ function icon_map() {
     icon_result=":team_speak:"
     ;;
   "1Password")
-    icon_result=":one_password:"
+    icon_result=":one_password:" # pragma: allowlist-secret
     ;;
   "Caprine")
     icon_result=":caprine:"
