@@ -104,6 +104,7 @@ alt-shift-0 = 'move-node-to-workspace 10'
 7 = ['secondary', 'main']
 8 = ['secondary', 'main']
 9 = ['secondary', 'main']
+10 = ['secondary', 'main']
 
 
 alt-shift-c = 'reload-config'

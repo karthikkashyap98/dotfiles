@@ -49,20 +49,24 @@ sketchybar --default "${default[@]}"
 sketchybar --add event aerospace_workspace_change
 SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
 # SPACES=()
-for sid in $(aerospace list-workspaces --all); do
-    sketchybar --add item space.$sid left \
-        --subscribe space.$sid aerospace_workspace_change \
-        --set space.$sid \
-        icon=${SPACE_ICONS[$sid-1]} \
-        icon.width=25 \
-        background.color=0xffEED3B1 \
-        background.corner_radius=5 \
-        background.height=20 \
-        background.drawing=off \
-        icon.align=center \
-        label.drawing=off \
-        click_script="aerospace workspace $sid" \
-        script="$CONFIG_DIR/plugins/aerospace.sh $sid"
+
+for mid in $(aerospace list-monitors | awk '{print $1}'); do 
+  for sid in $(aerospace list-workspaces --monitor $mid); do
+      sketchybar --add item space.$sid left \
+          --subscribe space.$sid aerospace_workspace_change \
+          --set space.$sid \
+          icon=${SPACE_ICONS[$sid-1]} \
+          icon.width=25 \
+          background.color=0xffEED3B1 \
+          background.corner_radius=5 \
+          display=$mid \
+          background.height=20 \
+          background.drawing=off \
+          icon.align=center \
+          label.drawing=off \
+          click_script="aerospace workspace $sid" \
+          script="$CONFIG_DIR/plugins/aerospace.sh $sid"
+  done
 done
 sketchybar --add item space_separator left                             \
            --set space_separator icon="􀆊"                                \
