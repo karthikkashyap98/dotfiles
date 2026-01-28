@@ -21,3 +21,4 @@ MEMORY_LABEL="$USED_MEM_GB GB"
 
 # Display the memory usage as one label in sketchybar
 sketchybar --set 'memory' label="  $MEMORY_LABEL"
+
