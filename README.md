@@ -20,7 +20,7 @@
 ## Installation Guide
 Clone the repository:
 ```bash
-git clone https://github.com/yourusername/dotfiles.git
+git clone https://github.com/karthikkashyap98/dotfiles.git
 cd dotfiles
 ```
 
