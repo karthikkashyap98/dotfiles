@@ -1,0 +1,23 @@
+# Theme: Catppuccin Macchiato — matches the sketchybar palette.
+# Alternative: "Rose Pine" to match the nvim colorscheme.
+theme = Catppuccin Macchiato
+
+# Font (JetBrains Mono is already the Ghostty default; we use the Nerd Font
+# build so p10k/tmux/nvim glyphs render, matching the sketchybar font)
+font-family = JetBrainsMono Nerd Font
+font-size = 14
+
+# Window appearance
+background-opacity = 0.92
+background-blur-radius = 20
+window-padding-x = 10
+window-padding-y = 10
+window-padding-balance = true
+mouse-hide-while-typing = true
+
+# Titlebar: no traffic-light buttons (same look as the old Alacritty config).
+# Options: native | hidden (keeps buttons) | buttonless | tabs
+macos-titlebar-style = buttonless
+
+# Reopen windows/tabs after app restart
+window-save-state = always
