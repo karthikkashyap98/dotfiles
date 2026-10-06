@@ -17,7 +17,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # ]
 
 exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+    '/opt/homebrew/bin/sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
 ]
 
 after-startup-command = [
@@ -32,7 +32,7 @@ outer.top = 30
 
 [mode.main.binding]
 # See: https://nikitabobko.github.io/AeroSpace/goodness#open-a-new-window-with-applescript
-alt-enter = '''exec-and-forget osascript -e 'tell application "Alacritty" to activate'
+alt-enter = '''exec-and-forget osascript -e 'tell application "Ghostty" to activate'
 '''
 
 cmd-h = [] # Disable "hide application"

@@ -111,18 +111,19 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+export NVM_DIR="$HOME/.nvm"
 source $(brew --prefix nvm)/nvm.sh
 
 export PATH="/opt/homebrew/opt/libressl/bin:$PATH"
 export LDFLAGS="-L/opt/homebrew/opt/libressl/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/libressl/include"
-export PATH=/Users/karthik/.local/share/ponyup/bin:$PATH
+[ -d "$HOME/.local/share/ponyup/bin" ] && export PATH="$HOME/.local/share/ponyup/bin:$PATH"
 export PATH="$HOME/Library/Python/3.9/bin:$PATH"
-export PATH=$PATH:$(go env GOPATH)/bin
+command -v go >/dev/null 2>&1 && export PATH="$PATH:$(go env GOPATH)/bin"
 
 # fastfetch
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-[ -f "/Users/karthik/.ghcup/env" ] && . "/Users/karthik/.ghcup/env" # ghcup-env
+[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
