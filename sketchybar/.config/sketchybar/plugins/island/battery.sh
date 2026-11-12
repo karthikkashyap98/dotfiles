@@ -2,6 +2,7 @@
 # Battery percentage, always shown in the left ear (next to the notch).
 # Muted normally, yellow below 40%, red below 20%, green bolt while charging.
 source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/plugins/island/guard.sh"   # exits if this copy is parked (layout.sh)
 
 BATT="$(pmset -g batt 2>/dev/null)"
 PCT="$(grep -Eo '[0-9]+%' <<<"$BATT" | head -1 | tr -d '%')"

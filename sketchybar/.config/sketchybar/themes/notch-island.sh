@@ -13,6 +13,11 @@
 #   right island  volume (shown for 2 s after a change) · date and time
 #
 # Notch on this MacBook: 185 x 32 pt (measured), so bar height 32 matches it exactly.
+#
+# Screens without a notch (external monitors, or clamshell mode) get no ears. The same group
+# becomes ONE centered island there instead:   [ warp off  82% │ IST 22:10 ]
+# plugins/island/layout.sh picks the screens for each version (display=) via the sbdisplays
+# helper and re-runs on display_change, so plugging a monitor in or out adapts live.
 
 source "$CONFIG_DIR/colors.sh"
 P="$CONFIG_DIR/plugins/island"
@@ -27,9 +32,6 @@ EAR_TUCK=-14
 # visible part (the 14pt tucked under the notch doesn't count). 30 outer + 45 inner (14 tucked).
 BATTERY_PAD_OUTER=30
 BATTERY_PAD_INNER=45
-
-# Build the mic/camera helper on first run (no permissions needed). Async so the bar isn't blocked.
-[[ -x "$CONFIG_DIR/helpers/bin/sbprivacy" ]] || "$CONFIG_DIR/helpers/build.sh" >/dev/null 2>&1 &!
 
 sketchybar --bar \
   height=32 color=$TRANSPARENT position=top sticky=on topmost=off \
@@ -54,6 +56,8 @@ ear=(
 )
 
 # ---- left island: workspace │ front app -------------------------------------------
+sketchybar --add event island_refresh --add event island_relayout
+
 sketchybar --add event aerospace_workspace_change \
   --add item space left \
   --set space icon.font="$FONT:ExtraBold:13.0" icon.color=$MAUVE \
@@ -77,7 +81,7 @@ sketchybar --add item battery q \
         padding_right=$EAR_TUCK icon.padding_left=$BATTERY_PAD_OUTER icon.padding_right=5 \
         label.padding_right=$BATTERY_PAD_INNER \
         script="$P/battery.sh" \
-  --subscribe battery power_source_change system_woke
+  --subscribe battery power_source_change system_woke island_refresh
 
 # The warp segment overlaps the battery by 12px (black on black) so the two read as one ear.
 # updates=on: it must keep polling while hidden, or it could never reappear.
@@ -86,7 +90,7 @@ sketchybar --add item warp q \
         padding_right=-12 icon.color=$RED icon.padding_left=14 \
         label.color=$RED label.padding_right=16 \
         script="$P/warp.sh" \
-  --subscribe warp system_woke mouse.clicked
+  --subscribe warp system_woke mouse.clicked island_refresh
 
 # ---- right ear (e = right of the notch): IST clock / mic + camera live ---------------
 sketchybar --add item ear.right e \
@@ -94,7 +98,7 @@ sketchybar --add item ear.right e \
         padding_left=$EAR_TUCK icon.drawing=off icon.font="$FONT:Bold:11.0" \
         label.padding_left=$(( -EAR_TUCK + 10 )) label.padding_right=14 \
         script="$P/ear_right.sh" \
-  --subscribe ear.right system_woke
+  --subscribe ear.right system_woke island_refresh
 
 # ---- right island: volume · clock (first added = rightmost) ------------------------------
 sketchybar --add item clock right \
@@ -108,6 +112,42 @@ sketchybar --add item clock right \
   --subscribe volume volume_change \
   --add bracket island.right volume clock \
   --set island.right "${island[@]}"
+
+# ---- center island (screens without a notch): the ears' contents as one island ------------
+# Same scripts as the ears (each acts on $NAME); ear_right.sh takes the icon padding as $1.
+# Center items are laid out left to right in the order added.
+sketchybar --add item island.warp center \
+  --set island.warp drawing=off updates=on update_freq=15 \
+        icon.color=$RED icon.padding_left=12 label.color=$RED label.padding_right=4 \
+        script="$P/warp.sh" \
+  --subscribe island.warp system_woke mouse.clicked island_refresh \
+  --add item island.battery center \
+  --set island.battery update_freq=60 icon.padding_left=12 icon.padding_right=5 \
+        script="$P/battery.sh" \
+  --subscribe island.battery power_source_change system_woke island_refresh \
+  --add item island.sep center \
+  --set island.sep icon="│" icon.color=0x40ffffff icon.font="$FONT:Regular:13.0" \
+        icon.padding_left=10 icon.padding_right=10 label.drawing=off \
+  --add item island.ist center \
+  --set island.ist updates=on update_freq=3 icon.drawing=off icon.font="$FONT:Bold:11.0" \
+        label.padding_right=12 script="$P/ear_right.sh 0" \
+  --subscribe island.ist system_woke island_refresh \
+  --add bracket island.center island.warp island.battery island.sep island.ist \
+  --set island.center "${island[@]}"
+
+# ---- display controller: ears on the notched screen, center island everywhere else --------
+sketchybar --add item island.layout left \
+  --set island.layout drawing=off updates=on script="$P/layout.sh" \
+  --subscribe island.layout display_change system_woke island_relayout
+
+# Place both groups now (synchronously) so nothing flashes on the wrong screen at load.
+NAME=island.layout SENDER=startup "$P/layout.sh"
+
+# Build the native helpers on first run (no permissions needed). Async so the bar isn't
+# blocked; once built, re-run the layout so the notch detection takes over.
+if [[ ! -x "$CONFIG_DIR/helpers/bin/sbprivacy" || ! -x "$CONFIG_DIR/helpers/bin/sbdisplays" ]]; then
+  { "$CONFIG_DIR/helpers/build.sh" >/dev/null 2>&1 && sketchybar --trigger island_relayout; } &!
+fi
 
 sketchybar --update
 sketchybar --trigger aerospace_workspace_change \

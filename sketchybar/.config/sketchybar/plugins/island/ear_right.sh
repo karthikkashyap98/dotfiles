@@ -3,6 +3,12 @@
 # The mic/camera check is helpers/bin/sbprivacy: it reads the OS "in use" flags only.
 # No permissions are needed and no audio or video is touched.
 source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/plugins/island/guard.sh"   # exits if this copy is parked (layout.sh)
+
+# $1: left padding before the icon. Default 24 clears the part of the ear tucked under the
+# notch; the centered island copy (island.ist, non-notched screens) passes a smaller value.
+ICON_PAD="${1:-24}"
+[[ "$ICON_PAD" =~ '^[0-9]+$' ]] || ICON_PAD=24
 
 PRIV="$CONFIG_DIR/helpers/bin/sbprivacy"
 MIC=0 CAM=0 APP=-
@@ -19,7 +25,7 @@ if (( MIC || CAM )); then
   [[ "$APP" != "-" && -n "$APP" ]] && label+=" · $APP"
 
   sketchybar --set "$NAME" icon="●" icon.drawing=on icon.color=$RED \
-             icon.padding_left=24 icon.padding_right=6 \
+             icon.padding_left=$ICON_PAD icon.padding_right=6 \
              label="$label" label.color=$RED label.padding_left=0
   (( WAS_LIVE )) || sketchybar --set "$NAME" y_offset=34 --animate tanh 18 --set "$NAME" y_offset=0
   # one slow pulse per update (every 3 s)
@@ -31,11 +37,11 @@ else
   TIME="$(TZ=Asia/Kolkata date +%H:%M)"
   if (( H >= 9 && H < 19 )); then
     sketchybar --set "$NAME" icon=$'\uf185' icon.drawing=on icon.color=$YELLOW \
-               icon.padding_left=24 icon.padding_right=6 \
+               icon.padding_left=$ICON_PAD icon.padding_right=6 \
                label="IST $TIME" label.color=$TEXT label.padding_left=0
   else
     sketchybar --set "$NAME" icon=$'\uf186' icon.drawing=on icon.color=$SUBTEXT0 \
-               icon.padding_left=24 icon.padding_right=6 \
+               icon.padding_left=$ICON_PAD icon.padding_right=6 \
                label="IST $TIME" label.color=$SUBTEXT0 label.padding_left=0
   fi
   (( WAS_LIVE )) && sketchybar --set "$NAME" y_offset=34 --animate tanh 18 --set "$NAME" y_offset=0

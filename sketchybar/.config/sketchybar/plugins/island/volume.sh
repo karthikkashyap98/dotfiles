@@ -12,7 +12,7 @@ else                      ICON=$''
 fi
 
 # Only the newest change may hide the item, so rapid key presses keep it on screen.
-TOKEN="${TMPDIR:-/tmp}/sketchybar-island-volume"
+TOKEN="${TMPDIR:-$(getconf DARWIN_USER_TEMP_DIR)}/sketchybar-island-volume"
 print -r -- "$$" >| "$TOKEN"
 
 sketchybar --set "$NAME" drawing=on icon="$ICON" label="${VOL}%" \

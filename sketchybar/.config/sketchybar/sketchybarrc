@@ -3,19 +3,22 @@
 # Switch with:  sbtheme <name>     (helpers/sketchybar-theme; no args lists themes)
 #
 # Themes:
-#   notch-island  black islands + ears that fuse with the MacBook notch (default)
+#   notch-island  black islands + ears that fuse with the MacBook notch
 #   ops-deck      solid black segmented work bar (workspaces, app, WARP, mic, battery, IST)
+#   quiet-text    lowercase text-only bar; alerts appear only when actionable (default)
+#   glyph-rail    two frosted capsules of monochrome glyphs, hover reveals labels
+#   mocha-pills   Catppuccin Mocha pills with tinted accents
 #   classic       the original Macchiato pill bar (sketchybarrc-laptop)
-# Other designs we explored are in dotfiles/docs/sketchybar-designs.html.
+# Design notes for all of these: dotfiles/docs/sketchybar-designs.html.
 
 CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/sketchybar}"
 export CONFIG_DIR
 THEME_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/sketchybar/theme"
 
-THEME="notch-island"
+THEME="quiet-text"
 [[ -r "$THEME_STATE" ]] && THEME="$(<"$THEME_STATE")"
 if [[ ! "$THEME" =~ '^[a-z0-9-]+$' || ! -r "$CONFIG_DIR/themes/$THEME.sh" ]]; then
-  THEME="notch-island"
+  THEME="quiet-text"
 fi
 
 source "$CONFIG_DIR/themes/$THEME.sh"

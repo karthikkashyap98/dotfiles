@@ -3,6 +3,7 @@
 # Drops out of the notch next to the battery; slides back in once WARP reconnects.
 # Click it to run `warp-cli connect`.
 source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/plugins/island/guard.sh"   # exits if this copy is parked (layout.sh)
 
 HIDDEN_OFFSET=34   # far enough to sit fully outside the 32px bar
 
