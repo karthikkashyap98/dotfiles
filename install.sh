@@ -76,6 +76,10 @@ log "Stowing configs (zsh tmux aerospace sketchybar nvim)"
   done
 )
 
+# sketchybar notch-island theme: native mic/camera-in-use helper (no permissions needed)
+log "Building sketchybar helpers"
+"$DOTFILES_DIR/sketchybar/.config/sketchybar/helpers/build.sh" || warn "sketchybar helper build failed (needs Xcode CLT: xcode-select --install)"
+
 # -------------------------------------------------------------------- tmux ----
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
   log "Installing tmux plugin manager (TPM)"

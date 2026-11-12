@@ -127,3 +127,6 @@ command -v go >/dev/null 2>&1 && export PATH="$PATH:$(go env GOPATH)/bin"
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 [ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
+
+# SketchyBar theme switcher (notch-island, classic, ...)
+alias sbtheme="$HOME/.config/sketchybar/helpers/sketchybar-theme"

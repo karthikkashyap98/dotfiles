@@ -1,16 +1,21 @@
 #!/usr/bin/env zsh
-
-SKETCHYBAR_CONFIG="$HOME/.config/sketchybar"
-
-# This is used to determine if a monitor is used
-# Since the notch is -only- on the laptop, if a monitor isn't used,
-# then that means the internal display is used ¯\_(ツ)_/¯
-# MAIN_DISPLAY=$(system_profiler SPDisplaysDataType | grep -B 3 'Main Display:' | awk '/Display Type/ {print $3}')
+# Theme loader. Each look lives in themes/<name>.sh; plugins are shared.
+# Switch with:  sbtheme <name>     (helpers/sketchybar-theme; no args lists themes)
 #
-#
-source "$SKETCHYBAR_CONFIG/sketchybarrc-laptop"
-# if [[ $MAIN_DISPLAY = "Built-in" ]]; then
-#     source "$SKETCHYBAR_CONFIG/sketchybarrc-laptop"
-# else
-    # source "$SKETCHYBAR_CONFIG/sketchybarrc-desktop"
-# fi
+# Themes:
+#   notch-island  black islands + ears that fuse with the MacBook notch (default)
+#   ops-deck      solid black segmented work bar (workspaces, app, WARP, mic, battery, IST)
+#   classic       the original Macchiato pill bar (sketchybarrc-laptop)
+# Other designs we explored are in dotfiles/docs/sketchybar-designs.html.
+
+CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/sketchybar}"
+export CONFIG_DIR
+THEME_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/sketchybar/theme"
+
+THEME="notch-island"
+[[ -r "$THEME_STATE" ]] && THEME="$(<"$THEME_STATE")"
+if [[ ! "$THEME" =~ '^[a-z0-9-]+$' || ! -r "$CONFIG_DIR/themes/$THEME.sh" ]]; then
+  THEME="notch-island"
+fi
+
+source "$CONFIG_DIR/themes/$THEME.sh"

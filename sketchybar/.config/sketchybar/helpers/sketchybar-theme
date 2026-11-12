@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+# Switch SketchyBar themes:  sbtheme            -> list themes, mark the current one
+#                            sbtheme <name>     -> switch and reload
+set -euo pipefail
+
+THEMES="${0:A:h:h}/themes"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/sketchybar"
+CURRENT="$(cat "$STATE_DIR/theme" 2>/dev/null || echo notch-island)"
+
+if (( $# == 0 )); then
+  for f in "$THEMES"/*.sh; do
+    name="${${f:t}%.sh}"
+    [[ "$name" == "$CURRENT" ]] && echo "* $name" || echo "  $name"
+  done
+  exit 0
+fi
+
+name="$1"
+if [[ ! "$name" =~ '^[a-z0-9-]+$' || ! -r "$THEMES/$name.sh" ]]; then
+  echo "unknown theme: $name (run sbtheme to list)" >&2
+  exit 1
+fi
+
+mkdir -p "$STATE_DIR"
+print -r -- "$name" > "$STATE_DIR/theme"
+sketchybar --reload
+echo "switched to $name"

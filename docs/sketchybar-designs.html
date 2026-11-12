@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SketchyBar Restyle Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: one reading column. Sticky control strip drives every bar specimen; contact sheet first, then one section per option. */
+:root{
+  --bg:#f2f2f6; --surface:#ffffff; --fg:#1d1d2b; --muted:#5d5f74; --line:#d9dae5;
+  --accent:#6a46d4; --accent-soft:#ece6fb; --code-bg:#f7f7fb;
+  --good:#2f8a4a; --warn:#a85a14; --bad:#c23a5a;
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",sans-serif;
+  --f-body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12121a; --surface:#1a1a25; --fg:#e3e3ee; --muted:#9a9cb3; --line:#2c2d3d;
+  --accent:#b9a2fb; --accent-soft:#2a2342; --code-bg:#161620;
+  --good:#7fd39a; --warn:#f3b27a; --bad:#f28aa5; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12121a; --surface:#1a1a25; --fg:#e3e3ee; --muted:#9a9cb3; --line:#2c2d3d;
+  --accent:#b9a2fb; --accent-soft:#2a2342; --code-bg:#161620;
+  --good:#7fd39a; --warn:#f3b27a; --bad:#f28aa5; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:44px 96px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+h1{font-size:clamp(2rem,4.5vw,3.2rem);font-weight:700;letter-spacing:-.02em}
+h2{font-size:1.75rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.02rem;font-weight:600;font-family:var(--f-body)}
+p{margin:0;max-width:68ch}
+code,.mono{font-family:var(--f-mono);font-size:.86em}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.08rem;color:var(--muted)}
+header{display:grid;gap:12px;margin-bottom:28px}
+section{margin-top:76px;display:grid;gap:20px}
+.muted{color:var(--muted)}
+.t{display:grid;gap:6px}
+
+/* sticky controls */
+.controls{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.controls label{font:500 .74rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cgroup{display:flex;gap:8px;align-items:center}
+.toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface);gap:2px}
+.toggle button{font:500 .82rem var(--f-body);border:0;background:transparent;color:var(--muted);padding:4px 13px;border-radius:999px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--accent-soft);color:var(--fg)}
+.toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.jump{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.jump a{font:500 .78rem var(--f-mono);text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 8px;background:var(--surface)}
+.jump a:hover{color:var(--fg)}
+
+/* ---------- specimen scene: deliberately its own "screen" with explicit colors ---------- */
+.scene-scroll{overflow-x:auto;border-radius:14px;border:1px solid var(--line)}
+.scene{position:relative;min-width:1120px;height:178px;overflow:hidden;font-family:var(--f-mono);color:#cdd6f4;
+  background:radial-gradient(120% 140% at 15% -10%,#4a3566 0%,transparent 55%),radial-gradient(90% 120% at 85% 0%,#1d3b57 0%,transparent 55%),linear-gradient(180deg,#191927,#0f0f17)}
+#lab[data-wall="bright"] .scene{background:radial-gradient(110% 150% at 10% -20%,#f7c9a8 0%,transparent 55%),radial-gradient(90% 130% at 90% -10%,#a9d6f2 0%,transparent 55%),linear-gradient(180deg,#eef0f8,#d9dfee)}
+.scene.mini{height:46px}
+.scene .win{position:absolute;left:24px;right:24px;top:48px;bottom:-20px;border-radius:12px;background:#1e1e2ef2;border:1px solid #ffffff12;padding:34px 20px 0;font-size:12px;line-height:1.7;color:#7f849c}
+.scene .win::before{content:"";position:absolute;left:14px;top:12px;width:44px;height:10px;background:radial-gradient(circle at 5px 5px,#f38ba8 4px,transparent 4.5px),radial-gradient(circle at 21px 5px,#f9e2af 4px,transparent 4.5px),radial-gradient(circle at 37px 5px,#a6e3a1 4px,transparent 4.5px)}
+.scene .win b{color:#cba6f7;font-weight:500} .scene .win i{color:#a6e3a1;font-style:normal}
+.notch{position:absolute;top:0;left:50%;width:188px;margin-left:-94px;height:32px;background:#000;border-radius:0 0 12px 12px;z-index:8}
+.bar{position:absolute;inset:0 0 auto 0;height:32px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;z-index:4;font-size:12.5px}
+.side{display:flex;align-items:center;gap:6px}
+.ic{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.calm,.hot{display:inline-flex;align-items:center;gap:6px}
+#lab[data-state="rest"] .hot{display:none!important}
+#lab[data-state="alert"] .calm{display:none!important}
+.mini-label{font:600 .76rem var(--f-mono);letter-spacing:.06em;color:var(--muted);display:flex;gap:10px;align-items:baseline}
+.mini-label a{text-decoration:none}
+.sheet{display:grid;gap:14px}
+
+.opt-head{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+.tagline{color:var(--muted);font-size:1rem}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px}
+@media (max-width:880px){.cols{grid-template-columns:1fr}}
+.notes{display:grid;gap:16px;align-content:start}
+.notes ul{margin:0;padding-left:1.1em;display:grid;gap:7px}
+.notes li{max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 .76rem var(--f-mono);padding:3px 9px;border-radius:6px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}
+.chip.k{color:var(--fg);border-color:var(--accent)}
+pre{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;font:400 12.5px/1.6 var(--f-mono);color:var(--fg)}
+pre .c{color:var(--muted)}
+
+/* ---------- A · Mocha Pills ---------- */
+.a .p{display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 10px;border-radius:8px;background:#313244e6;color:#cdd6f4;box-shadow:0 1px 0 #ffffff0d inset}
+.a .ws{gap:2px;padding:0 3px}
+.a .ws b{font-weight:700;width:22px;height:20px;display:grid;place-items:center;border-radius:6px;color:#a6adc8}
+.a .ws b.on{background:#cba6f7;color:#1e1e2e}
+#lab[data-state="alert"] .a .meet{background:#fab387;color:#1e1e2e}
+.a .off{color:#7f849c}
+/* ---------- B · Notch Island ---------- */
+.b .isl{display:inline-flex;align-items:center;gap:10px;height:28px;padding:0 12px;border-radius:10px;background:#000;color:#e6e6ee;border:1px solid #ffffff1a;box-shadow:0 4px 14px #0006}
+.b .sep{color:#ffffff40}
+.ear{position:absolute;top:0;height:32px;background:#000;display:flex;align-items:center;gap:8px;font-size:12px;color:#a6adc8;z-index:7;font-family:var(--f-mono)}
+.ear.lft{right:calc(50% + 94px - 14px);border-radius:0 0 0 12px;padding:0 18px 0 14px}
+.ear.rgt{left:calc(50% + 94px - 14px);border-radius:0 0 12px 0;padding:0 14px 0 18px}
+#lab[data-state="alert"] .ear.lft{color:#fab387}
+.join{background:#fab387;color:#11111b;border-radius:6px;padding:1px 7px;font-weight:700}
+.live{color:#f38ba8}
+.ext .b .ctr{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+/* ---------- C · Quiet Text ---------- */
+.c.bar{background:#11111b66;backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2);font-size:12px}
+.c .side{gap:0} .c .hot{gap:0}
+.c .t{color:#cdd6f4c4} .c .dim{color:#cdd6f455;padding:0 5px} .c .em{color:#cdd6f4}
+.c .faint{color:#cdd6f475}
+.c .ws{color:#cba6f7;font-weight:700;margin-right:12px}
+.c .red{color:#f38ba8} .c .pch{color:#fab387} .c .more{color:#cdd6f499}
+/* ---------- D · Ops Deck ---------- */
+.d.bar{background:#000000f0;border-bottom:1px solid #ffffff14;padding:0;font-size:12px}
+.d .side{gap:0;height:100%}
+.d .seg{display:inline-flex;align-items:center;gap:7px;height:100%;padding:0 10px;border-right:1px solid #ffffff14;color:#cdd6f4;position:relative}
+.d .side.r .seg{border-right:0;border-left:1px solid #ffffff14}
+.d .k{font-size:10.5px;letter-spacing:.08em;color:#9399b2;font-weight:700}
+.d .ws{padding:0 4px;gap:0}
+.d .ws b{width:24px;text-align:center;color:#a6adc8;font-weight:500;height:32px;line-height:32px;border-bottom:2px solid transparent}
+.d .ws b.on{color:#cdd6f4;border-bottom-color:#89b4fa;background:#89b4fa1f}
+.d .oncall{background:#f38ba8;color:#11111b;font-weight:700}
+.d .oncall .k{color:#11111b}
+.d .red{color:#f38ba8}
+.pop{position:absolute;top:36px;left:0;width:340px;background:#181825;border:1px solid #45475a;border-radius:10px;padding:8px;z-index:9;box-shadow:0 12px 30px #000a;font-size:11.5px;display:grid;gap:2px;font-family:var(--f-mono)}
+.pop .row{display:flex;gap:10px;padding:5px 8px;border-radius:6px;color:#cdd6f4}
+.pop .row.sel{background:#313244}
+.pop .row span:first-child{color:#89b4fa;flex:none}
+.pop .row em{font-style:normal;color:#7f849c;margin-left:auto;flex:none}
+.mini .pop{display:none!important}
+/* ---------- E · Glyph Rail ---------- */
+.e .cap{display:inline-flex;align-items:center;gap:14px;height:26px;padding:0 13px;border-radius:13px;background:#1e1e2ea8;border:1px solid #ffffff14;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:#a6adc8}
+.e .dots{display:inline-flex;gap:5px;align-items:center}
+.e .dots i{width:6px;height:6px;border-radius:50%;background:#6c7086}
+.e .dots i.on{width:16px;border-radius:3px;background:#cba6f7}
+.e .g{display:inline-flex;align-items:center;gap:4px}
+.e .n{font-size:11px;font-weight:700}
+.e .pch{color:#fab387} .e .red{color:#f38ba8}
+.e .faint{color:#6c7086}
+.e .tip{position:absolute;top:36px;font-size:11px;background:#11111b;border:1px solid #45475a;color:#cdd6f4;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.mini .tip{display:none}
+
+/* ---------- tables, cards ---------- */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:780px;font-size:.9rem}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--code-bg)}
+tr:last-child td{border-bottom:0}
+td .mono{color:var(--muted)}
+.uses{font-family:var(--f-mono);font-size:.8rem;letter-spacing:.1em;white-space:nowrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:6px;align-content:start}
+.card .where{font:500 .75rem var(--f-mono);color:var(--muted)}
+.sev{font:600 .7rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase}
+.sev.bug{color:var(--bad)} .sev.perf{color:var(--warn)} .sev.tidy{color:var(--muted)}
+.pick{background:var(--accent-soft);border-radius:14px;padding:22px 24px;display:grid;gap:14px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.rule{display:grid;gap:4px;padding:12px 14px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 10px 10px 0}
+.rule b{font-family:var(--f-body)}
+ol.prio{margin:0;padding-left:1.3em;display:grid;gap:3px;font-family:var(--f-mono);font-size:.86rem}
+.log{display:grid;gap:10px}
+.log li{max-width:75ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-term" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9l3 3-3 3M12.5 15H17"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-mr" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="19" r="2.2"/><path d="M6 7.2v9.6M18 16.8V11a4 4 0 0 0-4-4h-3m2-2.5L10.5 7 13 9.5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/></symbol>
+  <symbol id="i-shieldx" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></symbol>
+  <symbol id="i-batlow" viewBox="0 0 24 24"><rect x="2.5" y="7" width="17" height="10" rx="2.5"/><path d="M22 10.5v3"/><rect x="5" y="9.5" width="3" height="5" rx="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></symbol>
+</svg>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">dotfiles / sketchybar · laptop + external monitor · v2 after two review rounds</span>
+  <h1>Five directions for your menu bar</h1>
+  <p class="lede">Each option gives the same bar on your notched MacBook a different shape. They share one rule: an item earns a spot only if you can act on it, and everything else stays hidden until a threshold trips. Use the controls to see every bar at rest or in the worst case, and on a dark or bright wallpaper.</p>
+</header>
+
+<div id="lab" data-state="rest" data-wall="dark">
+<div class="controls" role="region" aria-label="Specimen controls">
+  <div class="cgroup"><label id="lb-state">State</label><div class="toggle" role="group" aria-labelledby="lb-state" data-key="state"><button type="button" aria-pressed="true" data-v="rest">At rest</button><button type="button" aria-pressed="false" data-v="alert">Needs you</button></div></div>
+  <div class="cgroup"><label id="lb-wall">Wallpaper</label><div class="toggle" role="group" aria-labelledby="lb-wall" data-key="wall"><button type="button" aria-pressed="true" data-v="dark">Dark</button><button type="button" aria-pressed="false" data-v="bright">Bright</button></div></div>
+  <nav class="jump" aria-label="Jump to option"><a href="#oa">A</a><a href="#ob">B</a><a href="#oc">C</a><a href="#od">D</a><a href="#oe">E</a><a href="#pk">Pick</a></nav>
+</div>
+
+<section aria-labelledby="sheet" style="margin-top:28px">
+  <div class="t"><span class="eyebrow">Contact sheet</span><h2 id="sheet">All five, stacked</h2>
+  <p class="muted">"Needs you" shows the worst case, with every alert firing at once, so you can check that the bar still fits. On a normal day you'd see one or two.</p></div>
+  <div class="sheet" id="sheet-list"></div>
+</section>
+
+<section aria-labelledby="rules">
+  <div class="t"><span class="eyebrow">Shared by every option</span><h2 id="rules">Rules for staying calm</h2></div>
+  <div class="rules">
+    <div class="rule"><b>Hidden until it matters</b><span class="muted">Battery appears below 20% and unplugged. WARP appears only when it disconnects. MR and on-call items appear only when they're non-zero. Volume appears for 2 seconds after you change it, then hides.</span></div>
+    <div class="rule"><b>One meeting threshold</b><span class="muted">The next meeting turns warm at 5 minutes everywhere. Clicking it opens the video link.</span></div>
+    <div class="rule"><b>Teammate clock dims off-hours</b><span class="muted">IST is bright from 09:00 to 19:00 and dim otherwise, so you can tell at a glance whether a ping will be seen. All mockups use 08:40 local, which is 22:10 IST, so it's dim.</span></div>
+    <div class="rule"><b>Width budget per side</b><span class="muted">About 420px on each side of the notch. When alerts overflow, the three most urgent show and the rest collapse into <code>+N</code>, in this order:</span>
+      <ol class="prio"><li>meeting ≤ 5 min</li><li>battery &lt; 20%</li><li>WARP off</li><li>on call</li><li>MRs to review</li><li>CPU hog</li></ol></div>
+  </div>
+</section>
+
+<section aria-labelledby="now">
+  <div class="t"><span class="eyebrow">Starting point</span><h2 id="now">What the bar does today</h2></div>
+  <div class="scene-scroll"><div class="scene" data-static>
+    <div class="notch"></div>
+    <div class="bar" style="font-size:12px">
+      <div class="side" style="gap:5px">
+        <span style="background:#f5a97f;color:#24273a;border-radius:5px;padding:4px 9px;font-weight:700">1</span>
+        <span style="background:#a6da95;color:#24273a;border-radius:5px;padding:5px 8px;display:inline-flex"><svg class="ic"><use href="#i-term"/></svg></span>
+        <span style="font-weight:700;color:#fff;text-shadow:0 1px 2px #0008">Ghostty</span>
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff"><span style="color:#ed8796">◷</span> Wed Nov 11 22:10</span>
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff"><span style="color:#f5bde6">☾ ☁</span> 12℃ Partly cloudy</span>
+      </div>
+      <div class="side" style="gap:5px">
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff">▤ 11.84 GB</span>
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff">▣ 14%</span>
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff">◀) 45%</span>
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff"><span style="color:#a6da95">▮</span> 82%</span>
+        <span style="background:#171f4076;border-radius:5px;padding:4px 8px;color:#fff"><span style="color:#ed8796">◷</span> Wed Nov 11 8:40:07</span>
+      </div>
+    </div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ nvim sketchybar/.config/sketchybar/sketchybarrc-laptop</div>
+  </div></div>
+  <div class="cols">
+    <div class="notes">
+      <p>Catppuccin <strong>Macchiato</strong> pills on a transparent bar: ten readouts, always visible. Ghostty, tmux, and nvim all use <strong>Mocha</strong>, so the bar is a slightly different palette from everything below it. None of the ten items asks you to do anything. You can't tell from the bar alone that the left-hand clock is IST, because both clocks use the same icon.</p>
+    </div>
+    <div class="notes">
+      <h3>Worth keeping</h3>
+      <ul>
+        <li>The <code>aerospace_workspace_change</code> wiring. Every option builds on it.</li>
+        <li>The IST clock, which is your one existing signal about whether teammates are around.</li>
+        <li>JetBrains Mono Nerd Font, which matches your terminal.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= A ================= -->
+<section aria-labelledby="oa" data-opt="A · Mocha Pills">
+  <div class="opt-head"><div class="t"><span class="eyebrow">Option A · evolution</span><h2 id="oa">Mocha Pills</h2><p class="tagline">Your current look, cleaned up and on the same palette as your terminal.</p></div></div>
+  <div class="scene-scroll"><div class="scene">
+    <div class="notch"></div>
+    <div class="bar a">
+      <div class="side">
+        <span class="p ws"><b class="on">1</b><b>2</b><b>4</b></span>
+        <span class="p"><svg class="ic" style="color:#a6e3a1"><use href="#i-term"/></svg>Ghostty</span>
+      </div>
+      <div class="side">
+        <span class="p meet"><svg class="ic"><use href="#i-cal"/></svg><span class="calm">Standup in 35m</span><span class="hot">Standup in 4m</span></span>
+        <span class="p hot" style="color:#f38ba8"><svg class="ic"><use href="#i-batlow"/></svg>18%</span>
+        <span class="p"><span class="off">IST 22:10</span></span>
+        <span class="p">Wed 08:40</span>
+      </div>
+    </div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ nvim sketchybar/.config/sketchybar/sketchybarrc-laptop</div>
+  </div></div>
+  <div class="cols">
+    <div class="notes">
+      <ul>
+        <li><strong>One palette and one surface.</strong> Mocha colors live in a <code>colors.sh</code> file. Every pill shares the same translucent surface, so the one filled pill, your focused workspace, is the thing your eye lands on.</li>
+        <li><strong>Occupied workspaces, not only the focused one.</strong> Empty workspaces hide. Click a number to jump to it.</li>
+        <li><strong>The next meeting replaces CPU and memory.</strong> It turns peach at 5 minutes.</li>
+        <li>Weather and the moon phase move into a popup on the clock. The clock drops its seconds.</li>
+      </ul>
+      <div class="meta"><span class="chip k">Small: 1 new script</span><span class="chip">5 readouts at rest</span><span class="chip">calendar CLI</span></div>
+    </div>
+<pre><span class="c"># colors.sh, Catppuccin Mocha. Source it in sketchybarrc AND at the</span>
+<span class="c"># top of every plugin; scripts don't inherit the rc's variables.</span>
+export SURFACE0=0xe6313244 TEXT=0xffcdd6f4 SUBTEXT=0xffa6adc8
+export OVERLAY0=0xff6c7086 MAUVE=0xffcba6f7 PEACH=0xfffab387 RED=0xfff38ba8
+
+sketchybar --default \
+  background.color=$SURFACE0 background.corner_radius=8 \
+  background.height=26 icon.color=$TEXT label.color=$TEXT \
+  icon.padding_left=10 label.padding_right=10 padding_right=6
+
+<span class="c"># single quotes: evaluated at click time, not at load</span>
+sketchybar --add item meeting right \
+  --set meeting update_freq=60 script="$PLUGIN_DIR/meeting.sh" \
+        click_script='open "$(cat /tmp/sb_meet_url)"'
+
+<span class="c"># meeting.sh: next event today</span>
+icalBuddy -n -nc -nrd -ea -li 1 -iep title,datetime \
+  -b '' -tf '%H:%M' eventsToday</pre>
+  </div>
+</section>
+
+<!-- ================= B ================= -->
+<section aria-labelledby="ob" data-opt="B · Notch Island">
+  <div class="opt-head"><div class="t"><span class="eyebrow">Option B · hardware-aware</span><h2 id="ob">Notch Island</h2><p class="tagline">Black islands, plus two "ears" that fuse with the notch so the bar looks like part of the screen.</p></div></div>
+  <div class="scene-scroll"><div class="scene">
+    <div class="notch"></div>
+    <div class="bar b">
+      <div class="side"><span class="isl"><b style="color:#cba6f7">1</b><span class="sep">|</span><svg class="ic"><use href="#i-term"/></svg>Ghostty</span></div>
+      <div class="side"><span class="isl">
+        <span class="hot" style="color:#f38ba8"><svg class="ic"><use href="#i-batlow"/></svg>18%</span><span class="hot sep">|</span>
+        <span class="hot" style="color:#f38ba8"><svg class="ic"><use href="#i-shieldx"/></svg>warp off</span><span class="hot sep">|</span>
+        <b>Wed 08:40</b></span></div>
+    </div>
+    <div class="ear lft"><span class="calm">Standup · 35m</span><span class="hot"><svg class="ic"><use href="#i-cal"/></svg>Standup · 4m <span class="join">Join</span></span></div>
+    <div class="ear rgt"><span class="calm" style="color:#7f849c">IST 22:10</span><span class="hot live"><span class="dot" style="background:#f38ba8;box-shadow:0 0 8px #f38ba8"></span>Mic live</span></div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ nvim sketchybar/.config/sketchybar/sketchybarrc-laptop</div>
+  </div></div>
+  <div class="cols">
+    <div class="notes">
+      <ul>
+        <li><strong>Uses the notch on purpose.</strong> SketchyBar's <code>q</code> and <code>e</code> positions sit directly left and right of the notch. Black ears there look like part of the hardware, much like Dynamic Island on an iPhone.</li>
+        <li><strong>The left ear is about time.</strong> It shows the next meeting, and from 5 minutes out it grows a peach <em>Join</em> button.</li>
+        <li><strong>The right ear is about people and privacy.</strong> It shows the teammate clock at rest. Whenever any app is using the microphone or camera, it switches to a red <em>Mic live</em>.</li>
+        <li>The outer islands are solid black with a hairline border, so they stay readable on any wallpaper. Try the bright one.</li>
+      </ul>
+      <div class="meta"><span class="chip k">Medium: 3 scripts + Swift helper</span><span class="chip">5 readouts at rest</span><span class="chip">inspired by sketchybar-island</span></div>
+    </div>
+<pre><span class="c"># q = left of the notch, e = right (works only with --add)</span>
+sketchybar --add item meeting q \
+  --set meeting background.color=0xff000000 \
+        background.height=44 background.y_offset=6 \
+        background.corner_radius=12 \
+        padding_right=-6 update_freq=30 \
+        script="$PLUGIN_DIR/meeting.sh"
+<span class="c">#   44px tall, shifted down 6px: the top corners sit above the</span>
+<span class="c">#   screen edge, so only the bottom corners show. The -6 padding</span>
+<span class="c">#   tucks the ear under the notch so no wallpaper peeks through.</span>
+<span class="c">#   (valid properties; exact pixel values need tuning on screen)</span>
+
+sketchybar --add item privacy e \
+  --set privacy update_freq=3 script="$PLUGIN_DIR/privacy.sh"
+<span class="c"># privacy.sh calls a ~30-line Swift helper that reads</span>
+<span class="c"># kAudioDevicePropertyDeviceIsRunningSomewhere (mic) and</span>
+<span class="c"># kCMIODevicePropertyDeviceIsRunningSomewhere (camera)</span>
+
+<span class="c"># 5 min out: the color animates, the label text swaps instantly</span>
+sketchybar --animate tanh 20 \
+  --set meeting label="Standup · 4m  Join" label.color=$PEACH</pre>
+  </div>
+</section>
+
+<!-- ================= C ================= -->
+<section aria-labelledby="oc" data-opt="C · Quiet Text">
+  <div class="opt-head"><div class="t"><span class="eyebrow">Option C · exceptions only</span><h2 id="oc">Quiet Text</h2><p class="tagline">No pills and no icons. If a word appears on the bar, it needs you.</p></div></div>
+  <div class="scene-scroll"><div class="scene">
+    <div class="notch"></div>
+    <div class="bar c">
+      <div class="side"><span class="ws">1</span><span class="em">ghostty</span></div>
+      <div class="side">
+        <span class="hot"><span class="pch">standup 4m</span><span class="dim">·</span></span>
+        <span class="hot"><span class="red">bat 18%</span><span class="dim">·</span></span>
+        <span class="hot"><span class="red">warp off</span><span class="dim">·</span></span>
+        <span class="hot"><span class="more">+2</span><span class="dim">·</span></span>
+        <span class="faint">ist 22:10</span><span class="dim">·</span><span class="em">wed 08:40</span>
+      </div>
+    </div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ nvim sketchybar/.config/sketchybar/sketchybarrc-laptop</div>
+  </div></div>
+  <div class="cols">
+    <div class="notes">
+      <ul>
+        <li><strong>Lowercase mono text on a blurred strip,</strong> separated by middle dots. It reads like a tmux status line, which suits a terminal-first setup.</li>
+        <li><strong>At rest it shows four things:</strong> the workspace, the app, and the two clocks. That's the fewest readouts of any option.</li>
+        <li><strong>Alerts are colored words.</strong> When more than three fire at once, the extras collapse into <code>+2</code>. Click it to see them, for example <code>2 mr</code> and <code>node 94%</code>. The CPU alert names the process, so you know what to kill.</li>
+        <li>The meeting shows only in its last 15 minutes. That makes it the strictest option.</li>
+      </ul>
+      <div class="meta"><span class="chip k">Small: 4 short scripts</span><span class="chip">4 readouts at rest</span><span class="chip">warp-cli, glab</span></div>
+    </div>
+<pre>sketchybar --bar color=0x6611111b blur_radius=30
+sketchybar --default background.drawing=off icon.drawing=off \
+  label.color=0xc4cdd6f4 label.font="$FONT_FACE:Medium:12.0"
+
+<span class="c"># hidden items must keep polling: the default is updates=when_shown</span>
+sketchybar --add item warp right \
+  --set warp drawing=off updates=on update_freq=15 \
+        script="$PLUGIN_DIR/warp.sh"
+
+<span class="c"># warp.sh</span>
+if warp-cli status | grep -q 'Status update: Connected'; then
+  sketchybar --set warp drawing=off
+else
+  sketchybar --set warp drawing=on label="warp off" label.color=$RED
+fi
+
+<span class="c"># cpu_hog.sh: keeps multi-word names like "Google Chrome Helper"</span>
+ps -Aceo pcpu,comm -r | awk 'NR==2{p=int($1);$1="";sub(/^ /,"");print p, $0}'</pre>
+  </div>
+</section>
+
+<!-- ================= D ================= -->
+<section aria-labelledby="od" data-opt="D · Ops Deck">
+  <div class="opt-head"><div class="t"><span class="eyebrow">Option D · on-call ready</span><h2 id="od">Ops Deck</h2><p class="tagline">A solid, segmented strip for work days. Click a segment for detail.</p></div></div>
+  <div class="scene-scroll"><div class="scene">
+    <div class="notch"></div>
+    <div class="bar d">
+      <div class="side">
+        <span class="seg ws"><b class="on">1</b><b>2</b><b>3</b><b>4</b></span>
+        <span class="seg"><svg class="ic" style="color:#a6e3a1"><use href="#i-term"/></svg>Ghostty</span>
+        <span class="seg oncall hot"><span class="k">ON CALL</span></span>
+        <span class="seg hot"><span class="k">MR</span><b style="color:#89b4fa">2</b>
+          <div class="pop" aria-label="Example review popup">
+            <div class="row sel"><span>!4812</span>dns-proxy: retry budget<em>2h</em></div>
+            <div class="row"><span>!4790</span>infra: rotate staging certs<em>1d</em></div>
+          </div></span>
+      </div>
+      <div class="side">
+        <span class="seg hot"><span class="k">WARP</span><span class="red">off</span></span>
+        <span class="seg"><span class="k">NEXT</span><span class="calm">09:15 Standup</span><span class="hot" style="color:#fab387">4m Standup</span></span>
+        <span class="seg"><b>08:40</b><span style="color:#7f849c">IST 22:10</span></span>
+      </div>
+    </div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ nvim sketchybar/.config/sketchybar/sketchybarrc-laptop</div>
+  </div></div>
+  <div class="cols">
+    <div class="notes">
+      <ul>
+        <li><strong>A full-width black bar,</strong> the same black as the notch, so the notch disappears into it. Hairline dividers and short uppercase keys make it read like a terminal header.</li>
+        <li><strong>The left side is what's waiting on you;</strong> the right side is time. The left holds your workspace and app, then the PagerDuty on-call badge (only during your shift) and the GitLab MRs waiting on your review (hidden at zero).</li>
+        <li><strong>Click for detail.</strong> The MR count opens a popup of titles and ages, and clicking a row opens that MR. <code>NEXT</code> opens today's agenda.</li>
+        <li>The trade-off: PagerDuty needs an API token in Keychain, and the review count costs one GitLab call every 5 minutes.</li>
+      </ul>
+      <div class="meta"><span class="chip k">Large: popups + 2 APIs</span><span class="chip">5 readouts at rest</span><span class="chip">glab, PagerDuty token</span></div>
+      <p class="muted" style="font-size:.85rem">The MR titles in the popup are made-up examples.</p>
+    </div>
+<pre>sketchybar --bar color=0xf0000000 border_color=0x14ffffff border_width=1
+
+sketchybar --add item mr left \
+  --set mr drawing=off updates=on update_freq=300 \
+        script="$PLUGIN_DIR/mr.sh" popup.align=left \
+        click_script="sketchybar --set mr popup.drawing=toggle"
+
+<span class="c"># mr.sh: outside a repo glab falls back to gitlab.com and gets a 401,</span>
+<span class="c"># and that JSON error object would count as "1". Pin host + group.</span>
+MRS=$(GITLAB_HOST=$CF_GITLAB glab mr list -g "$CF_GROUP" \
+        --reviewer=@me -F json 2>/dev/null) || exit 0
+N=$(jq 'if type=="array" then length else 0 end' <<< "$MRS")
+sketchybar --set mr drawing=$([ "$N" -gt 0 ] && echo on || echo off) label="$N"
+
+<span class="c"># one popup row per MR</span>
+jq -r '.[] | "\(.iid)\t\(.title)\t\(.web_url)"' <<< "$MRS" | ...</pre>
+  </div>
+</section>
+
+<!-- ================= E ================= -->
+<section aria-labelledby="oe" data-opt="E · Glyph Rail">
+  <div class="opt-head"><div class="t"><span class="eyebrow">Option E · icons first</span><h2 id="oe">Glyph Rail</h2><p class="tagline">Two small frosted capsules of monochrome glyphs. Numbers appear only when something trips.</p></div></div>
+  <div class="scene-scroll"><div class="scene">
+    <div class="notch"></div>
+    <div class="bar e">
+      <div class="side"><span class="cap"><span class="dots" aria-label="Workspaces 1, 2, 4; 1 focused"><i class="on"></i><i></i><i></i></span><svg class="ic" style="color:#cdd6f4"><use href="#i-term"/></svg></span></div>
+      <div class="side" style="position:relative"><span class="cap">
+        <span class="g calm"><svg class="ic"><use href="#i-cal"/></svg></span>
+        <span class="g hot pch"><svg class="ic"><use href="#i-cal"/></svg><span class="n">4m</span></span>
+        <span class="g hot red"><svg class="ic"><use href="#i-batlow"/></svg><span class="n">18</span></span>
+        <span class="g hot red"><svg class="ic"><use href="#i-shieldx"/></svg></span>
+        <span class="g hot pch"><svg class="ic"><use href="#i-mr"/></svg><span class="n">2</span></span>
+        <span class="g faint"><svg class="ic"><use href="#i-globe"/></svg></span>
+        <span style="color:#cdd6f4;font-weight:700">08:40</span></span>
+        <span class="tip calm" style="right:52px">IST 22:10 · off hours</span>
+      </div>
+    </div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ nvim sketchybar/.config/sketchybar/sketchybarrc-laptop</div>
+  </div></div>
+  <div class="cols">
+    <div class="notes">
+      <ul>
+        <li><strong>Glyphs instead of words.</strong> Workspaces are dots, and the focused one stretches into a mauve dash. The app is its icon. At rest the right capsule holds just two muted glyphs and the time.</li>
+        <li><strong>Hover reveals.</strong> Pointing at a glyph slides out its label using <code>mouse.entered</code> and <code>--animate</code>. The specimen shows the IST tooltip.</li>
+        <li><strong>Color plus a number means act.</strong> A glyph turns peach or red and gains a short count (<code>4m</code>, <code>18</code>, <code>2</code>). Every alert stays one glyph wide, so this option has the most room for alerts.</li>
+        <li>The cost is recall: you have to learn what each glyph means. It suits someone who wants the bar to be close to invisible.</li>
+      </ul>
+      <div class="meta"><span class="chip k">Medium: hover + animate</span><span class="chip">3 readouts + 2 glyphs at rest</span><span class="chip">no new CLIs</span></div>
+    </div>
+<pre><span class="c"># a glyph that reveals its label on hover</span>
+sketchybar --add item ist right \
+  --set ist icon=󰖟 label.drawing=off label.width=0 \
+        icon.color=$OVERLAY0 update_freq=60 script="$PLUGIN_DIR/ist.sh" \
+  --subscribe ist mouse.entered mouse.exited
+
+<span class="c"># ist.sh</span>
+case "$SENDER" in
+  mouse.entered) sketchybar --animate tanh 12 --set "$NAME" \
+                   label.drawing=on label.width=dynamic ;;
+  mouse.exited)  sketchybar --animate tanh 12 --set "$NAME" label.width=0 ;;
+  *) H=$(TZ=Asia/Kolkata date +%H)
+     C=$([ "$H" -ge 9 ] && [ "$H" -lt 19 ] && echo $TEXT || echo $OVERLAY0)
+     sketchybar --set "$NAME" label="IST $(TZ=Asia/Kolkata date +%H:%M)" icon.color=$C ;;
+esac
+
+<span class="c"># workspaces as dots in one capsule</span>
+sketchybar --add bracket rail '/space\..*/' front_app \
+  --set rail background.color=0xa81e1e2e background.corner_radius=13</pre>
+  </div>
+</section>
+
+<!-- ================= pick ================= -->
+<section aria-labelledby="pk">
+  <div class="pick">
+    <span class="eyebrow">Recommendation</span>
+    <h2 id="pk">B on the laptop, with a fallback for the external monitor</h2>
+    <p>Notch Island gives the MacBook a distinct look and puts the two most time-sensitive signals, the next meeting and the live mic, at the top center of your screen. It already follows the calm rules: battery and WARP stay hidden until they trip. Your external monitors have no notch, so the ears become one centered island. Your AeroSpace config already reserves the 32px gap on those displays.</p>
+  </div>
+  <div class="mini-label">B · external monitor (no notch)</div>
+  <div class="scene-scroll"><div class="scene ext">
+    <div class="bar b">
+      <div class="side"><span class="isl"><b style="color:#cba6f7">1</b><span class="sep">|</span><svg class="ic"><use href="#i-term"/></svg>Ghostty</span></div>
+      <div class="ctr">
+        <span class="isl" style="color:#a6adc8"><span class="calm">Standup · 35m</span><span class="hot" style="color:#fab387"><svg class="ic"><use href="#i-cal"/></svg>Standup · 4m <span class="join">Join</span></span><span class="sep">|</span><span class="calm" style="color:#7f849c">IST 22:10</span><span class="hot live"><span class="dot" style="background:#f38ba8"></span>Mic live</span></span>
+      </div>
+      <div class="side"><span class="isl">
+        <span class="hot" style="color:#f38ba8"><svg class="ic"><use href="#i-batlow"/></svg>18%</span><span class="hot sep">|</span>
+        <span class="hot" style="color:#f38ba8"><svg class="ic"><use href="#i-shieldx"/></svg>warp off</span><span class="hot sep">|</span>
+        <b>Wed 08:40</b></span></div>
+    </div>
+    <div class="win"><b>~/dotfiles</b> on <i>cf</i> ❯ aerospace list-monitors</div>
+  </div></div>
+<pre><span class="c"># sketchybarrc: same items, positioned by display</span>
+<span class="c"># sketch: decide where the ears go based on the main display</span>
+if system_profiler SPDisplaysDataType | grep -B6 'Main Display: Yes' | grep -q 'Built-in'; then
+  EAR_L=q; EAR_R=e        <span class="c"># hug the notch</span>
+else
+  EAR_L=center; EAR_R=center   <span class="c"># one centered island</span>
+fi
+sketchybar --add item meeting $EAR_L ... --add item privacy $EAR_R ...</pre>
+  <p class="muted">Second choice: <strong>C</strong>, if you'd rather the bar disappear completely. B's calm rules came from C, so going from one to the other later is mostly a styling change.</p>
+</section>
+
+<!-- ================= comparison ================= -->
+<section aria-labelledby="cmp">
+  <div class="t"><span class="eyebrow">Side by side</span><h2 id="cmp">How they compare</h2>
+  <p class="muted">A readout is one distinct piece of information, such as a clock or a workspace list. Size is how much new scripting each option needs.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Option</th><th>Shape</th><th>At rest</th><th>Best at</th><th>Size</th><th>Watch out for</th></tr></thead>
+    <tbody>
+      <tr><td><strong>A · Mocha Pills</strong></td><td>Translucent pills</td><td class="mono">5 readouts</td><td>Least disruption; matches your terminal palette</td><td class="mono">Small</td><td>Still the most decorated of the five</td></tr>
+      <tr><td><strong>B · Notch Island</strong></td><td>Black islands + notch ears</td><td class="mono">5 readouts</td><td>Meetings and mic privacy at eye level</td><td class="mono">Medium</td><td>Needs the centered fallback on external monitors</td></tr>
+      <tr><td><strong>C · Quiet Text</strong></td><td>Plain text, blurred strip</td><td class="mono">4 readouts</td><td>Calm focus; alerts stand out because nothing else is colored</td><td class="mono">Small</td><td>Relies on blur over bright wallpapers</td></tr>
+      <tr><td><strong>D · Ops Deck</strong></td><td>Solid segmented bar</td><td class="mono">5 readouts</td><td>Review queue and on-call visibility, with detail on click</td><td class="mono">Large</td><td>Busiest when alerts fire; depends on two API tokens</td></tr>
+      <tr><td><strong>E · Glyph Rail</strong></td><td>Frosted icon capsules</td><td class="mono">3 + 2 glyphs</td><td>Close to invisible; most room for alerts</td><td class="mono">Medium</td><td>You have to learn what each glyph means</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= insights ================= -->
+<section aria-labelledby="ins">
+  <div class="t"><span class="eyebrow">Insight menu</span><h2 id="ins">Signals you can act on</h2>
+  <p class="muted">These work in any option. Each appears only while its trigger is true.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Signal</th><th>Shows when</th><th>Click does</th><th>Data source</th><th>Drawn in</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Next meeting</strong></td><td>Warm at ≤ 5 min</td><td>Opens the video link</td><td><code>icalBuddy</code> (old; needs Calendar permission) or the EventKit-based <code>macos-calendar-events</code>. Google calendars must be added to Calendar.app.</td><td class="uses">A B C D E</td></tr>
+      <tr><td><strong>Teammate hours</strong></td><td>Always (in B it gives way to "Mic live" while the mic is on); dim outside 09–19 IST</td><td>—</td><td><code>TZ=Asia/Kolkata date</code></td><td class="uses">A B C D E</td></tr>
+      <tr><td><strong>Battery low</strong></td><td>&lt; 20% and unplugged</td><td>—</td><td><code>pmset -g batt</code> (includes time remaining)</td><td class="uses">A B C E</td></tr>
+      <tr><td><strong>WARP down</strong></td><td>Not connected</td><td><code>warp-cli connect</code></td><td><code>warp-cli status</code> every 15 s</td><td class="uses">B C D E</td></tr>
+      <tr><td><strong>MRs to review</strong></td><td>Count &gt; 0</td><td>Popup list; a row opens the MR</td><td><code>glab mr list -g … --reviewer=@me -F json</code> every 5 min</td><td class="uses">C D E</td></tr>
+      <tr><td><strong>On call</strong></td><td>During your PagerDuty shift</td><td>Opens incidents</td><td>PagerDuty <code>/oncalls</code> API, token in Keychain</td><td class="uses">D</td></tr>
+      <tr><td><strong>Mic or camera live</strong></td><td>Any process is using them</td><td>—</td><td>Small Swift helper using the CoreAudio and CoreMediaIO "running somewhere" flags. Bluetooth mics may not report.</td><td class="uses">B</td></tr>
+      <tr><td><strong>CPU hog</strong></td><td>One process &gt; 80% for 30 s</td><td>Opens Activity Monitor</td><td><code>ps -Aceo pcpu,comm -r</code>; a counter file tracks the 30 s</td><td class="uses">C</td></tr>
+      <tr><td><strong>Unread Slack</strong></td><td>Badge count &gt; 0</td><td>Focuses Slack's workspace</td><td><code>lsappinfo info -only StatusLabel Slack</code>. Parse the whole value, since slicing cuts counts above 9 to one digit. A "•" means activity with no count.</td><td class="uses">—</td></tr>
+      <tr><td><strong>Workspace app icons</strong></td><td>Always, per workspace</td><td>Jumps to that workspace</td><td>One hidden item runs <code>aerospace list-windows --all</code> and updates every workspace item at once. Icons come from <code>sketchybar-app-font</code>.</td><td class="uses">—</td></tr>
+      <tr><td><strong>AeroSpace mode</strong></td><td>You're in service or resize mode</td><td>—</td><td><code>on-mode-changed</code> callback triggers a custom event</td><td class="uses">—</td></tr>
+      <tr><td><strong>Disk low</strong></td><td>&lt; 15 GB free</td><td>Opens Storage settings</td><td><code>df -g /</code> hourly</td><td class="uses">—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ================= fixes ================= -->
+<section aria-labelledby="fx">
+  <div class="t"><span class="eyebrow">Apply whichever option you pick</span><h2 id="fx">Fixes in the current config</h2></div>
+  <div class="cards">
+    <div class="card"><span class="sev bug">Bug · verified</span><h3>The workspace fallback always fails</h3><span class="where">plugins/current_space.sh:4</span><p><code>aerospace list-workspaces --monitor focused --focused</code> exits with "Conflicting options" on your machine, so the pill stays blank until AeroSpace sends its first event. Use <code>aerospace list-workspaces --focused</code>.</p></div>
+    <div class="card"><span class="sev bug">Bug</span><h3>The startup trigger fires the wrong event</h3><span class="where">sketchybarrc-laptop: last line</span><p>The last line fires <code>space_change</code>, which nothing listens to. Use <code>--trigger aerospace_workspace_change FOCUSED_WORKSPACE=$(aerospace list-workspaces --focused)</code>.</p></div>
+    <div class="card"><span class="sev bug">Bug</span><h3>A stray blank line breaks a command</h3><span class="where">sketchybarrc-laptop:95–97</span><p>The <code>\</code> on line 95 is followed by a blank line, so zsh runs <code>label.drawing=yes</code> as a command and fails with "command not found". You can't see it only because labels draw by default.</p></div>
+    <div class="card"><span class="sev perf">Accuracy</span><h3>Weather reports WARP's exit location</h3><span class="where">plugins/weather.sh</span><p>ipinfo and wttr.in geolocate by IP, so behind WARP they report the exit location, such as San Jose. Hard-code your city, and drop both ipinfo calls.</p></div>
+    <div class="card"><span class="sev perf">Cost</span><h3>The clock runs its script every second</h3><span class="where">clock · update_freq=1</span><p>That's 86,400 script runs a day. Drop the seconds and set <code>update_freq=30</code>.</p></div>
+    <div class="card"><span class="sev perf">Accuracy</span><h3>Memory overstates usage</h3><span class="where">plugins/memory.sh</span><p>It counts inactive pages and ignores compressed memory. Active + wired + compressed comes close to Activity Monitor, or show memory only when <code>memory_pressure</code> reports pressure.</p></div>
+    <div class="card"><span class="sev tidy">Tidy</span><h3>Leftovers</h3><span class="where">rc + plugins</span><p>Several small leftovers:</p><ul><li><code>label.color</code> is set twice; white wins.</li><li>The <code>cpu</code> item sets <code>script=</code> twice.</li><li><code>weather.moon</code> subscribes to clicks but has no script.</li><li><code>memory.sh</code> has no shebang.</li><li>Both clocks use the same icon.</li><li><code>weather.sh</code>'s <code>return</code> works under zsh, but <code>exit</code> is clearer.</li></ul></div>
+    <div class="card"><span class="sev tidy">Heads-up</span><h3>Hidden items stop polling</h3><span class="where">SketchyBar 2.24</span><p>The default <code>updates=when_shown</code> means an item with <code>drawing=off</code> never runs its script, so it can never turn itself back on. Set <code>updates=on</code> on every exception item.</p></div>
+  </div>
+</section>
+
+<section aria-labelledby="how">
+  <div class="t"><span class="eyebrow">Process</span><h2 id="how">How this was made</h2></div>
+  <div class="cols">
+    <div class="notes">
+      <h3>Two review rounds</h3>
+      <ul class="log">
+        <li><strong>Design review.</strong> It found that option E duplicated A's shape, so E is now the Glyph Rail. Four bars ran under the notch; there's now a width budget and an overflow order. Battery, volume, and weather were showing at rest; they're hidden now. The recommendation had no drawing; there's now an external-monitor specimen. The reviewer also asked for this contact sheet and the bright-wallpaper test.</li>
+        <li><strong>Technical review.</strong> I checked the snippets against the SketchyBar docs and ran them on your machine. Fixes:<ul><li>The click_script now uses single quotes, so it's evaluated at click time.</li><li>glab now pins the host and group, so an error doesn't read as "1".</li><li>The warp-cli grep is exact.</li><li>The CPU script keeps multi-word process names.</li><li><code>updates=on</code> is added to hidden items.</li><li>The aerospace fallback bug was found and confirmed.</li></ul></li>
+      </ul>
+    </div>
+    <div class="notes">
+      <h3>Inspiration</h3>
+      <ul>
+        <li><a href="https://github.com/FelixKratz/dotfiles/tree/master/.config/sketchybar" target="_blank" rel="noopener">FelixKratz/dotfiles</a>: bordered pills, blurred popups, and C event providers instead of shell polling</li>
+        <li><a href="https://github.com/garamnohhh/sketchybar-island" target="_blank" rel="noopener">sketchybar-island</a> and <a href="https://github.com/crissNb/Dynamic-Island-Sketchybar" target="_blank" rel="noopener">Dynamic-Island-Sketchybar</a>: the source of B's notch idea</li>
+        <li><a href="https://github.com/kvndrsslr/sketchybar-app-font" target="_blank" rel="noopener">sketchybar-app-font</a>: app glyphs for workspaces</li>
+        <li><a href="https://github.com/nicolas-martin/awesome-sketchybar" target="_blank" rel="noopener">awesome-sketchybar</a>: plugin index for meetings, VPN, Focus, and Pomodoro</li>
+        <li><a href="https://github.com/zigotica/macos-calendar-events" target="_blank" rel="noopener">macos-calendar-events</a>: an EventKit replacement for icalBuddy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div>
+</div>
+
+<script>
+(function(){
+  var lab=document.getElementById('lab');
+  document.querySelectorAll('.controls .toggle').forEach(function(g){
+    g.addEventListener('click',function(e){
+      var b=e.target.closest('button'); if(!b) return;
+      g.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+      lab.setAttribute('data-'+g.dataset.key,b.dataset.v);
+    });
+  });
+  var list=document.getElementById('sheet-list');
+  document.querySelectorAll('section[data-opt]').forEach(function(sec){
+    var src=sec.querySelector('.scene');
+    var label=document.createElement('div'); label.className='mini-label';
+    var a=document.createElement('a'); a.href='#'+sec.querySelector('h2').id; a.textContent=sec.dataset.opt;
+    label.appendChild(a);
+    var wrap=document.createElement('div'); wrap.className='scene-scroll';
+    var mini=document.createElement('div'); mini.className='scene mini'; mini.setAttribute('aria-hidden','true');
+    Array.prototype.forEach.call(src.children,function(ch){ if(!ch.classList.contains('win')) mini.appendChild(ch.cloneNode(true)); });
+    wrap.appendChild(mini);
+    var item=document.createElement('div'); item.style.display='grid'; item.style.gap='6px';
+    item.appendChild(label); item.appendChild(wrap); list.appendChild(item);
+  });
+})();
+</script>

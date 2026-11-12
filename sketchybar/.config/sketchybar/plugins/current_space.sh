@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 
 # $FOCUSED_WORKSPACE is injected by the trigger in aerospace.toml
-WS="${FOCUSED_WORKSPACE:-$(aerospace list-workspaces --monitor focused --focused)}"
+WS="${FOCUSED_WORKSPACE:-$(aerospace list-workspaces --focused)}"
 
 # Map certain workspaces to icons, else show the number
 case "$WS" in
