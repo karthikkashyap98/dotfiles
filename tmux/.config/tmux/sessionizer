@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#
+# tmux-sessionizer — fuzzy-jump between project tmux sessions.
+#
+# Lists existing sessions plus project dirs under the roots below. Picking a
+# dir creates a session named after it with the default window layout:
+#   win 1 nvim · win 2 opencode · win 3 shell
+#
+# Bound to <C-s>s in ~/.tmux.conf; also runnable straight from a shell.
+
+set -euo pipefail
+
+command -v fzf >/dev/null 2>&1 || { echo "sessionizer: fzf is not installed" >&2; exit 1; }
+
+# Project roots scanned for session candidates. Edit to taste.
+PROJECT_ROOTS=(
+    "$HOME/code"
+    "$HOME/work"
+)
+
+# Always offered, even when not under a root.
+EXTRA_PROJECTS=(
+    "$HOME/dotfiles"
+)
+
+sessions=$(tmux list-sessions -F '#S' 2>/dev/null || true)
+
+dirs=""
+for root in "${PROJECT_ROOTS[@]}" "${EXTRA_PROJECTS[@]}"; do
+    [ -d "$root" ] || continue
+    dirs+="$(find "$root" -mindepth 1 -maxdepth 1 -type d 2>/dev/null)"$'\n'
+done
+
+choice=$(printf '%s\n%s' "$sessions" "$dirs" | sed '/^$/d' | sort -u \
+    | fzf --prompt='tmux session ❯ ' --height=40% --reverse || true)
+[ -z "${choice:-}" ] && exit 0
+
+name=$(basename "$choice")
+
+if ! tmux has-session -t "=$name" 2>/dev/null; then
+    # New session: start in the project dir, build the default window layout.
+    tmux new-session -d -s "$name" -c "$choice"
+    tmux rename-window -t "$name:1" 'nvim'
+    tmux new-window -d -t "$name:" -n 'opencode' -c "$choice"
+    tmux new-window -d -t "$name:" -n 'shell' -c "$choice"
+    tmux select-window -t "$name:1"
+fi
+
+if [ -n "${TMUX:-}" ]; then
+    exec tmux switch-client -t "$name"
+else
+    exec tmux attach-session -t "$name"
+fi
