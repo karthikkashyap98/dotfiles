@@ -19,7 +19,7 @@
 Requires Homebrew and Xcode Command Line Tools.
 
 ```bash
-git clone -b cf https://github.com/karthikkashyap98/dotfiles.git ~/dotfiles
+git clone https://github.com/karthikkashyap98/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ./install.sh            # packages + shell + configs + tmux plugins
 ./install.sh --all      # also macOS settings and the sketchybar service
